@@ -128,6 +128,32 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
         return null;
     }
 
+    public void addGameToPlayerCollection(Player player, BoardGame boardGame) {
+        getConnection();
+        String query = "INSERT INTO player_owns_game (player_name, board_game_bggURL) VALUES (?, ?)";
+        try {
+            PreparedStatement myStmt = connection.prepareStatement(query);
+            myStmt.setString(1, player.getPlayerName());
+            myStmt.setString(2, boardGame.getBGG_URL());
+            myStmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeGameFromPlayerCollection(Player player, BoardGame boardGame) {
+        getConnection();
+        String query = "DELETE FROM player_owns_game WHERE player_name = ? AND board_game_bggURL = ?";
+        try {
+            PreparedStatement myStmt = connection.prepareStatement(query);
+            myStmt.setString(1, player.getPlayerName());
+            myStmt.setString(2, boardGame.getBGG_URL());
+            myStmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Persists a given player to the DB. Note that this player might already exist and only needs an update :-)
      * @param player the player
