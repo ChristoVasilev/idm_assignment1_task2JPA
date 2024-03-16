@@ -1,5 +1,7 @@
 package tudelft.wis.idm_tasks.boardGameTracker.interfaces;
 
+import tudelft.wis.idm_tasks.boardGameTracker.BoardGameImplementation;
+
 import java.util.Collection;
 
 // Add other necessary imports here
@@ -31,9 +33,10 @@ public interface Player {
     
     /**
      * Returns all the boardgames this player owns (if any).
+     *
      * @return collection of boardgames this player owns
      */
-    public Collection<BoardGame> getGameCollection();
+    public Collection<BoardGameImplementation> getGameCollection();
         // @TODO: Implement this method.
    
     

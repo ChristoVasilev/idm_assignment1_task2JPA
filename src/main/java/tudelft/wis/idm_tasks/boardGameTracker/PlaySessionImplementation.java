@@ -1,31 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package tudelft.wis.idm_solutions.BoardGameTracker.POJO_Implementation;
+package tudelft.wis.idm_tasks.boardGameTracker;
 
+import jakarta.persistence.*;
+import tudelft.wis.idm_tasks.boardGameTracker.interfaces.*;
 import java.util.Collection;
 import java.util.Date;
 
-import tudelft.wis.idm_tasks.boardGameTracker.PlayerImplementation;
-import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
-import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
-import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
-
-/**
- * POJO (Plain Old Java Object) Implementation without any database
- * functionality.
- *
- * @author Christoph Lofi, Alexandra Neagu
- */
-public class PlaySession_POJO implements PlaySession {
+@Entity(name = "play_session")
+public class PlaySessionImplementation implements PlaySession{
+    @Id
+    private int id;
 
     private Date date;
-    private Player host;
-    private BoardGame game;
+    @ManyToOne
+    private PlayerImplementation host;
+    @ManyToOne
+    private BoardGameImplementation game;
+    @Column(name = "play_time")
     private int playTime;
-    private Collection<Player> players;
-    private Player winner;
+    @ManyToMany
+    private Collection<PlayerImplementation> players;
+    @ManyToOne
+    private PlayerImplementation winner;
+
+    public PlaySessionImplementation() {
+    }
 
     @Override
     public Date getDate() {
@@ -81,7 +79,7 @@ public class PlaySession_POJO implements PlaySession {
      * @param players  the players
      * @param winner   the winner
      */
-    public PlaySession_POJO(Date date, Player host, BoardGame game, int playTime, Collection<Player> players, Player winner) {
+    public PlaySessionImplementation(Date date, PlayerImplementation host, BoardGameImplementation game, int playTime, Collection<PlayerImplementation> players, PlayerImplementation winner) {
         this.date = date;
         this.host = host;
         this.game = game;
@@ -89,5 +87,4 @@ public class PlaySession_POJO implements PlaySession {
         this.players = players;
         this.winner = winner;
     }
-
 }

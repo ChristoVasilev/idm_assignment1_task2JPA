@@ -1,14 +1,20 @@
 package tudelft.wis.idm_tasks.boardGameTracker;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class BoardGameImplementation implements tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame {
-    /**
-     * The Name.
-     */
+
+    @Id
     String name;
     /**
      * The BoardGameGeek.com URL of the boardgame.
      */
     String bggURL;
+
+    public BoardGameImplementation() {
+    }
 
     @Override
     public String getName() {

@@ -1,5 +1,7 @@
 package tudelft.wis.idm_tasks.boardGameTracker.interfaces;
 
+import tudelft.wis.idm_tasks.boardGameTracker.PlayerImplementation;
+
 import java.util.Collection;
 import java.util.Date;
 
@@ -41,7 +43,7 @@ public interface PlaySession {
      *
      * @return collection of players who joined the session
      */
-    public Collection<Player> getAllPlayers();
+    public Collection<PlayerImplementation> getAllPlayers();
         // @TODO: Implement this method.
 
     /**

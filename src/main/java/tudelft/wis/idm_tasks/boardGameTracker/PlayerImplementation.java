@@ -1,14 +1,24 @@
 package tudelft.wis.idm_tasks.boardGameTracker;
 
-import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
+
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class PlayerImplementation implements tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player {
+
+@Entity
+@Table(name = "players")
+public class PlayerImplementation implements Player {
+    @Id
     private String name;
     private String nickName;
-    private Collection<BoardGame> gameCollection = new LinkedList<BoardGame>();
+    @ManyToMany
+    private Collection<BoardGameImplementation> gameCollection = new LinkedList<>();
 
     /**
      * Instantiates a new Player POJO.
@@ -19,6 +29,9 @@ public class PlayerImplementation implements tudelft.wis.idm_tasks.boardGameTrac
     public PlayerImplementation(String name, String nickName) {
         this.name = name;
         this.nickName = nickName;
+    }
+
+    public PlayerImplementation() {
     }
 
     @Override
@@ -32,7 +45,7 @@ public class PlayerImplementation implements tudelft.wis.idm_tasks.boardGameTrac
     }
 
     @Override
-    public Collection<BoardGame> getGameCollection() {
+    public Collection<BoardGameImplementation> getGameCollection() {
         return gameCollection;
     }
 
