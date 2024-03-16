@@ -30,7 +30,7 @@ public class TableCreator {
         try {
             getConnection();
             myStmt = connection.prepareStatement(setup);
-            myStmt.executeUpdate();
+            myStmt.execute();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -49,7 +49,7 @@ public class TableCreator {
     }
 
     public void createPlayerOwnsBoardGame() {
-        String setup = "CREATE TABLE IF NOT EXISTS playerOwnsBoardGame ( player_name VARCHAR(64) NOT NULL, board_game_bggURL VARCHAR(64) NOT NULL, "
+        String setup = "CREATE TABLE IF NOT EXISTS player_owns_board_game ( player_name VARCHAR(64) NOT NULL, board_game_bggURL VARCHAR(64) NOT NULL, "
         + "PRIMARY KEY (player_name, board_game_bggURL), FOREIGN KEY (player_name) REFERENCES players(name) ON DELETE CASCADE, "
         + "FOREIGN KEY (board_game_bggURL) REFERENCES board_games(bggURL) ON DELETE CASCADE)";
         PreparedStatement myStmt = null;
