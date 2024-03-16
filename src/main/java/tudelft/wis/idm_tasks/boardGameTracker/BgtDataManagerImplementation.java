@@ -1,8 +1,8 @@
 package tudelft.wis.idm_tasks.boardGameTracker;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaDelete;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
-import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
 
 import java.sql.*;
@@ -15,15 +15,15 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
     /**
      * Creates a new player and stores it in the DB.
      *
-     * @param name the player name
+     * @param name     the player name
      * @param nickname the player nickname
      * @return the new player
      * @throws java.sql.SQLException DB trouble
      */
-    public Player createNewPlayer(String name, String nickname) throws BgtException {
+    public PlayerImplementation createNewPlayer(String name, String nickname) throws BgtException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
-        Player player = new PlayerImplementation(name, nickname);
+        PlayerImplementation player = new PlayerImplementation(name, nickname);
 
         try {
             transaction.begin();
@@ -116,16 +116,16 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
     /**
      * Creates a new play session and stores it in the DB.
      *
-     * @param date the date of the session
-     * @param host the session host
-     * @param game the game which was played
+     * @param date     the date of the session
+     * @param host     the session host
+     * @param game     the game which was played
      * @param playtime the approximate playtime in minutes
-     * @param players all players
-     * @param winner the one player who won (NULL in case of no winner; multiple
-     * winners not supported)
+     * @param players  all players
+     * @param winner   the one player who won (NULL in case of no winner; multiple
+     *                 winners not supported)
      * @return the new play session
      */
-    public PlaySession createNewPlaySession(Date date, PlayerImplementation host, BoardGameImplementation game, int playtime, Collection<PlayerImplementation> players, PlayerImplementation winner) throws BgtException {
+    public PlaySessionImplementation createNewPlaySession(Date date, PlayerImplementation host, BoardGameImplementation game, int playtime, Collection<PlayerImplementation> players, PlayerImplementation winner) throws BgtException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
         PlaySessionImplementation playSession = new PlaySessionImplementation(date, host, game, playtime, players, winner);
@@ -229,5 +229,14 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
         } finally {
             entityManager.close();
         }
+    }
+
+    public void eraseDatabase() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaDelete<Player> deletePlayers = entityManager.getCriteriaBuilder().createCriteriaDelete(Player.class);
+        CriteriaDelete<BoardGame> deleteBoardGames = entityManager.getCriteriaBuilder().createCriteriaDelete(BoardGame.class);
+
+        entityManager.createQuery(deletePlayers).executeUpdate();
+        entityManager.createQuery(deleteBoardGames).executeUpdate();
     }
 }

@@ -31,7 +31,7 @@ public class BgtDataManagerImplementationTest extends tudelft.wis.idm_solutions.
     private BgtDataManagerImplementation dataManager = new BgtDataManagerImplementation();
 
     @Override
-    public BgtDataManager getBgtDataManager() {
+    public BgtDataManagerImplementation getBgtDataManager() {
         return dataManager;
     }
 
@@ -44,7 +44,7 @@ public class BgtDataManagerImplementationTest extends tudelft.wis.idm_solutions.
     public void basicTest() throws BgtException {
         // Make sure to start this test with an empty DB - trivial for POJO though...
         // Create dummy data
-        Collection<PlaySession> testSessions = this.createDummyData(12, 6);
+        Collection<PlaySessionImplementation> testSessions = this.createDummyData(12, 6);
 
         for (PlaySession session : testSessions) {
             Logger.info("Session Created: \n" + session.toVerboseString());
@@ -70,7 +70,7 @@ public class BgtDataManagerImplementationTest extends tudelft.wis.idm_solutions.
         assertEquals(firstsession.getDate(), retrievedSession.iterator().next().getDate());
 
         // Remove a game from the host's collection, add  it again
-        BoardGame firstGame = host.getGameCollection().iterator().next();
+        BoardGameImplementation firstGame = host.getGameCollection().iterator().next();
         int numOfGames = host.getGameCollection().size();
         host.getGameCollection().remove(firstGame);
         this.getBgtDataManager().persistPlayer(host);
@@ -80,7 +80,7 @@ public class BgtDataManagerImplementationTest extends tudelft.wis.idm_solutions.
         assertEquals(numOfGames - 1, hostFromDB.getGameCollection().size());
 
         // Add the game again
-        hostFromDB.getGameCollection().add((BoardGameImplementation) firstGame);
+        hostFromDB.getGameCollection().add(firstGame);
         this.getBgtDataManager().persistPlayer(host);
 
         // Load the host again from DB

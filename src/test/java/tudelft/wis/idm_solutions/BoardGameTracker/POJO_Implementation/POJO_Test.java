@@ -6,6 +6,7 @@ package tudelft.wis.idm_solutions.BoardGameTracker.POJO_Implementation;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.Logger;
+import tudelft.wis.idm_tasks.boardGameTracker.BgtDataManagerImplementation;
 import tudelft.wis.idm_tasks.boardGameTracker.BgtException;
 import tudelft.wis.idm_tasks.boardGameTracker.PlaySessionImplementation;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BgtDataManager;
@@ -33,8 +34,8 @@ public class POJO_Test extends tudelft.wis.idm_solutions.BoardGameTracker.Abstra
     private BgtDataManager_POJO dataManager = new BgtDataManager_POJO();
 
     @Override
-    public BgtDataManager getBgtDataManager() {
-        return dataManager;
+    public BgtDataManagerImplementation getBgtDataManager() {
+        return null;
     }
 
     /**
@@ -47,7 +48,7 @@ public class POJO_Test extends tudelft.wis.idm_solutions.BoardGameTracker.Abstra
 
         // Make sure to start this test with an empty DB - trivial for POJO though...
         // Create dummy data
-        Collection<PlaySession> testSessions = this.createDummyData(12, 6);
+        Collection<PlaySession> testSessions = null;
 
         for (PlaySession session : testSessions) {
             Logger.info("Session Created: \n" + session.toVerboseString());

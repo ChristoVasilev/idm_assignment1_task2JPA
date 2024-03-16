@@ -21,7 +21,7 @@ public class PlaySessionImplementation implements PlaySession{
     private int playTime;
     @ManyToOne
     private PlayerImplementation winner;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "player_in_session",
             joinColumns = @JoinColumn(name = "session_id"),

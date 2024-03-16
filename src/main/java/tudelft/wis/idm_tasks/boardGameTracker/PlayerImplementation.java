@@ -15,7 +15,7 @@ public class PlayerImplementation implements Player {
     private String name;
     @Column(name = "nick_name")
     private String nickName;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "player_owns_game",
             joinColumns = @JoinColumn(name = "player_name"),
