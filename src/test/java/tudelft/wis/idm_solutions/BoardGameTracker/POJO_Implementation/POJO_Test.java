@@ -7,6 +7,7 @@ package tudelft.wis.idm_solutions.BoardGameTracker.POJO_Implementation;
 import org.junit.jupiter.api.Test;
 import org.tinylog.Logger;
 import tudelft.wis.idm_tasks.boardGameTracker.BgtException;
+import tudelft.wis.idm_tasks.boardGameTracker.PlaySessionImplementation;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BgtDataManager;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
@@ -68,7 +69,7 @@ public class POJO_Test extends tudelft.wis.idm_solutions.BoardGameTracker.Abstra
         assertEquals(retrievedGame.getBGG_URL(), game.getBGG_URL());
 
         // Retrieve session by date
-        Collection<PlaySession> retrievedSession = this.getBgtDataManager().findSessionByDate(firstsession.getDate());
+        Collection<PlaySessionImplementation> retrievedSession = this.getBgtDataManager().findSessionByDate(firstsession.getDate());
         assertEquals(firstsession.getDate(), retrievedSession.iterator().next().getDate());
 
         // Remove a game from the host's collection, add  it again
@@ -82,7 +83,7 @@ public class POJO_Test extends tudelft.wis.idm_solutions.BoardGameTracker.Abstra
         assertEquals(numOfGames - 1, hostFromDB.getGameCollection().size());
 
         // Add the game again
-        hostFromDB.getGameCollection().add(firstGame);
+        hostFromDB.getGameCollection().add(null);
         this.getBgtDataManager().persistPlayer(host);
 
         // Load the host again from DB

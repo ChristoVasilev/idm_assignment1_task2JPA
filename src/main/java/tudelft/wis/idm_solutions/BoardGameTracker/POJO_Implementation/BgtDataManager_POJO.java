@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import tudelft.wis.idm_tasks.boardGameTracker.BgtException;
+import tudelft.wis.idm_tasks.boardGameTracker.BoardGameImplementation;
+import tudelft.wis.idm_tasks.boardGameTracker.PlaySessionImplementation;
+import tudelft.wis.idm_tasks.boardGameTracker.PlayerImplementation;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BgtDataManager;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
@@ -41,8 +44,8 @@ public class BgtDataManager_POJO implements BgtDataManager {
     }
 
     @Override
-    public PlaySession createNewPlaySession(Date date, Player host, BoardGame game, int playtime, Collection<Player> players, Player winner) throws BgtException {
-        PlaySession_POJO session = new PlaySession_POJO(date, host, game, playtime, players, winner);
+    public PlaySession createNewPlaySession(Date date, PlayerImplementation host, BoardGameImplementation game, int playtime, Collection<PlayerImplementation> players, PlayerImplementation winner) throws BgtException {
+        PlaySession_POJO session = new PlaySession_POJO(date, host, game, playtime, null, winner);
         sessions.add(session);
         return session;
     }
@@ -70,14 +73,14 @@ public class BgtDataManager_POJO implements BgtDataManager {
     }
 
     @Override
-    public Collection<PlaySession> findSessionByDate(Date date) throws BgtException {
+    public Collection<PlaySessionImplementation> findSessionByDate(Date date) throws BgtException {
         Collection<PlaySession> result = new LinkedList<PlaySession>();
         for (PlaySession_POJO session : sessions) {
             if (session.getDate().equals(date)) {
                 result.add(session);
             }
         }
-        return result;
+        return null;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class BgtDataManager_POJO implements BgtDataManager {
     }
 
     @Override
-    public void persistPlaySession(PlaySession session) {
+    public void persistPlaySession(PlaySessionImplementation session) {
      // Do nothing as there is no DB...
     }
 

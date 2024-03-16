@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import tudelft.wis.idm_tasks.boardGameTracker.BgtException;
+import tudelft.wis.idm_tasks.boardGameTracker.BoardGameImplementation;
+import tudelft.wis.idm_tasks.boardGameTracker.PlaySessionImplementation;
+import tudelft.wis.idm_tasks.boardGameTracker.PlayerImplementation;
 
 // Add other necessary imports here
 
@@ -76,7 +79,7 @@ public interface BgtDataManager {
      * winners not supported)
      * @return the new play session
      */
-    public PlaySession createNewPlaySession(Date date, Player host, BoardGame game, int playtime, Collection<Player> players, Player winner) throws BgtException;
+    public PlaySession createNewPlaySession(Date date, PlayerImplementation host, BoardGameImplementation game, int playtime, Collection<PlayerImplementation> players, PlayerImplementation winner) throws BgtException;
         // @TODO: Implement this method.
 
     /**
@@ -86,7 +89,7 @@ public interface BgtDataManager {
      * @return collection of all play sessions from the param date
      * @throws BgtException the bgt exception
      */
-    public Collection<PlaySession> findSessionByDate(Date date) throws BgtException;
+    public Collection<PlaySessionImplementation> findSessionByDate(Date date) throws BgtException;
         // @TODO: Implement this method.
 
     /**
@@ -100,7 +103,7 @@ public interface BgtDataManager {
      * Persists a given session to the DB. Note that this session might already exist and only needs an update :-)
      * @param session the session
      */
-    public void persistPlaySession(PlaySession session);
+    public void persistPlaySession(PlaySessionImplementation session);
         // @TODO: Implement this method.
 
     /**

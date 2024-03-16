@@ -1,28 +1,18 @@
 package tudelft.wis.idm_tasks.boardGameTracker;
 
+import jakarta.persistence.*;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
 
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.boardGameTracker.interfaces.BgtDataManager {
-    private static Connection connection;
-
-    public Connection getConnection()  {
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/boardGames", "postgres", "Sarah1809");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return connection;
-    }
-
+    private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("boardGamesJPA");
 
     /**
      * Creates a new player and stores it in the DB.
@@ -33,17 +23,22 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @throws java.sql.SQLException DB trouble
      */
     public Player createNewPlayer(String name, String nickname) throws BgtException {
-        getConnection();
-        String insertQuery = "INSERT INTO players (name, nick_name) VALUES (?, ?)";
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        Player player = new PlayerImplementation(name, nickname);
+
         try {
-            PreparedStatement myStmt = connection.prepareStatement(insertQuery);
-            myStmt.setString(1, name);
-            myStmt.setString(2, nickname);
-            myStmt.executeUpdate();
+            transaction.begin();
+            entityManager.persist(player);
+            transaction.commit();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            entityManager.close();
         }
-        return new PlayerImplementation(name, nickname);
+        return player;
     }
 
     /**
@@ -54,38 +49,16 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @throws BgtException the bgt exception
      */
     public Collection<Player> findPlayersByName(String name) throws BgtException {
-        getConnection();
-        String findIDQuery = "SELECT name, nick_name FROM players WHERE name LIKE CONCAT('%', ?, '%')";
-        ResultSet resultSet = null;
-        try {
-            PreparedStatement myStmt = connection.prepareStatement(findIDQuery);
-            myStmt.setString(1, name);
-            resultSet = myStmt.executeQuery();
-            Collection<Player> players = new ArrayList<>();
-            while(resultSet.next()) {
-                String fullName = resultSet.getString("name");
-                String nickname = resultSet.getString("nick_name");
-                players.add(new PlayerImplementation(fullName, nickname));
-            }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-            ResultSet boardGameOwned = null;
-            for(Player player : players) {
-                String findGamesQuery = "SELECT bg.name, bg.url FROM board_games AS bg JOIN player_owns_game AS pog " +
-                        "ON pog.board_game_url = bg.url JOIN players AS p ON p.name = pog.player_name " +
-                        "WHERE p.name = ?";
-                PreparedStatement statement = connection.prepareStatement(findGamesQuery);
-                statement.setString(1, player.getPlayerName());
-                boardGameOwned = statement.executeQuery();
-                while(boardGameOwned.next()) {
-                    String boardGameName = boardGameOwned.getString("name");
-                    String bggURL = boardGameOwned.getString("url");
-                    player.getGameCollection().add(new BoardGameImplementation(boardGameName, bggURL));
-                }
-            }
-            return players;
-        } catch (SQLException e) {
-            eraseDatabase();
-            throw new RuntimeException(e);
+        try {
+            TypedQuery<Player> query = entityManager.createQuery(
+                    "SELECT p FROM PlayerImplementation p WHERE p.name LIKE CONCAT('%', :playerName, '%')", Player.class);
+
+            query.setParameter("playerName", name);
+            return query.getResultList();
+        } finally {
+            entityManager.close();
         }
     }
 
@@ -103,17 +76,22 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @throws SQLException DB trouble
      */
     public BoardGame createNewBoardgame(String name, String bggURL) throws BgtException {
-        String insertQuery = "INSERT INTO board_games (name, url) VALUES (?, ?)";
-        getConnection();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        BoardGame boardGame = new BoardGameImplementation(name, bggURL);
+
         try {
-            PreparedStatement myStmt = connection.prepareStatement(insertQuery);
-            myStmt.setString(1, name);
-            myStmt.setString(2, bggURL);
-            myStmt.executeUpdate();
+            transaction.begin();
+            entityManager.persist(boardGame);
+            transaction.commit();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            entityManager.close();
         }
-        return new BoardGameImplementation(name, bggURL);
+        return boardGame;
     }
 
     /**
@@ -124,20 +102,16 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @return collection of all boardgames containing the param substring in their names
      */
     public Collection<BoardGame> findGamesByName(String name) throws BgtException {
-        String findIDQuery = "SELECT name, url FROM board_games WHERE name LIKE CONCAT('%', ?, '%')";
-        ResultSet resultSet = null;
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+
         try {
-            PreparedStatement myStmt = connection.prepareStatement(findIDQuery);
-            myStmt.setString(1, name);
-            resultSet = myStmt.executeQuery();
-            Collection<BoardGame> boardGames = new ArrayList<>();
-            while(resultSet.next()) {
-                String bggUrl = resultSet.getString("url");
-                boardGames.add(new BoardGameImplementation(name, bggUrl));
-            }
-            return boardGames;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            TypedQuery<BoardGame> query = entityManager.createQuery(
+                    "SELECT bg FROM BoardGameImplementation bg WHERE bg.name LIKE CONCAT('%', :gameName, '%')", BoardGame.class);
+
+            query.setParameter("gameName", name);
+            return query.getResultList();
+        } finally {
+            entityManager.close();
         }
     }
 
@@ -153,8 +127,23 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * winners not supported)
      * @return the new play session
      */
-    public PlaySession createNewPlaySession(Date date, Player host, BoardGame game, int playtime, Collection<Player> players, Player winner) throws BgtException {
-        return null;
+    public PlaySession createNewPlaySession(Date date, PlayerImplementation host, BoardGameImplementation game, int playtime, Collection<PlayerImplementation> players, PlayerImplementation winner) throws BgtException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        PlaySessionImplementation playSession = new PlaySessionImplementation(date, host, game, playtime, players, winner);
+
+        try {
+            transaction.begin();
+            entityManager.persist(playSession);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+        } finally {
+            entityManager.close();
+        }
+        return playSession;
     }
 
     /**
@@ -164,33 +153,17 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @return collection of all play sessions from the param date
      * @throws BgtException the bgt exception
      */
-    public Collection<PlaySession> findSessionByDate(Date date) throws BgtException {
-        return null;
-    }
+    public Collection<PlaySessionImplementation> findSessionByDate(Date date) throws BgtException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-    public void addGameToPlayerCollection(Player player, BoardGame boardGame) {
-        getConnection();
-        String query = "INSERT INTO player_owns_game (player_name, board_game_url) VALUES (?, ?)";
         try {
-            PreparedStatement myStmt = connection.prepareStatement(query);
-            myStmt.setString(1, player.getPlayerName());
-            myStmt.setString(2, boardGame.getBGG_URL());
-            myStmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            TypedQuery<PlaySessionImplementation> query = entityManager.createQuery(
+                    "SELECT ps FROM PlaySessionImplementation ps WHERE ps.date = :date", PlaySessionImplementation.class);
 
-    public void removeGameFromPlayerCollection(Player player, BoardGame boardGame) {
-        getConnection();
-        String query = "DELETE FROM player_owns_game WHERE player_name = ? AND board_game_url = ?";
-        try {
-            PreparedStatement myStmt = connection.prepareStatement(query);
-            myStmt.setString(1, player.getPlayerName());
-            myStmt.setString(2, boardGame.getBGG_URL());
-            myStmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            query.setParameter("date", date);
+            return query.getResultList();
+        } finally {
+            entityManager.close();
         }
     }
 
@@ -199,16 +172,20 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @param player the player
      */
     public void persistPlayer(Player player) {
-        getConnection();
-        String query = "INSERT INTO players (name, nick_name) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET nick_name = ?";
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+
         try {
-            PreparedStatement myStmt = connection.prepareStatement(query);
-            myStmt.setString(1, player.getPlayerName());
-            myStmt.setString(2, player.getPlayerNickName());
-            myStmt.setString(3, player.getPlayerNickName());
-            myStmt.executeUpdate();
-        } catch (SQLException e) {
+            TypedQuery<PlayerImplementation> query = entityManager.createQuery(
+                    "SELECT p FROM PlayerImplementation p WHERE p.name = :name", PlayerImplementation.class);
+
+            query.setParameter("name", player.getPlayerName());
+            if(query.getResultList() == null) {
+                createNewPlayer(player.getPlayerName(), player.getPlayerNickName());
+            }
+        } catch (BgtException e) {
             throw new RuntimeException(e);
+        } finally {
+            entityManager.close();
         }
     }
 
@@ -216,8 +193,22 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * Persists a given session to the DB. Note that this session might already exist and only needs an update :-)
      * @param session the session
      */
-    public void persistPlaySession(PlaySession session) {
+    public void persistPlaySession(PlaySessionImplementation session) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
+        try {
+            TypedQuery<PlaySessionImplementation> query = entityManager.createQuery(
+                    "SELECT ps FROM PlaySessionImplementation ps WHERE ps.id = :id", PlaySessionImplementation.class);
+
+            query.setParameter("id", session.getId());
+            if(query.getResultList() == null) {
+                createNewPlaySession(session.getDate(), session.getHost(), session.getGame(), session.getPlaytime(), session.getAllPlayers(), session.getWinner());
+            }
+        } catch (BgtException e) {
+            throw new RuntimeException(e);
+        } finally {
+            entityManager.close();
+        }
     }
 
     /**
@@ -225,26 +216,20 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @param game the game
      */
     public void persistBoardGame(BoardGame game) {
-        String query = "INSERT INTO board_games (name, url) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET name = ?";
-        try {
-            PreparedStatement myStmt = connection.prepareStatement(query);
-            myStmt.setString(1, game.getName());
-            myStmt.setString(2, game.getBGG_URL());
-            myStmt.setString(3, game.getName());
-            myStmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-    public void eraseDatabase() {
-        getConnection();
-        String query = "DELETE FROM players; DELETE FROM board_games; DELETE FROM player_owns_game;";
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+            TypedQuery<BoardGame> query = entityManager.createQuery(
+                    "SELECT bg FROM BoardGameImplementation bg WHERE bg.bggURL = :gameName", BoardGame.class);
+
+            query.setParameter("gameName", game.getBGG_URL());
+            if(query.getResultList() == null) {
+                createNewBoardgame(game.getName(), game.getBGG_URL());
+            }
+        } catch (BgtException e) {
             throw new RuntimeException(e);
+        } finally {
+            entityManager.close();
         }
     }
 }

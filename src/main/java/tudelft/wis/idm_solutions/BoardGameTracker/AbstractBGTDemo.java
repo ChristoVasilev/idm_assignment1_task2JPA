@@ -2,6 +2,7 @@ package tudelft.wis.idm_solutions.BoardGameTracker;
 
 import com.github.javafaker.Faker;
 import tudelft.wis.idm_tasks.boardGameTracker.BgtException;
+import tudelft.wis.idm_tasks.boardGameTracker.BoardGameImplementation;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BgtDataManager;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
@@ -87,7 +88,7 @@ public abstract class AbstractBGTDemo {
             Player newPlayer = dbManager.createNewPlayer(faker.name().fullName(), faker.pokemon().name());
             Collection<BoardGame> playerGames = rndSubset(games, RND.nextInt(3));
             for (BoardGame game : playerGames) {
-                newPlayer.getGameCollection().add(game);
+                newPlayer.getGameCollection().add((BoardGameImplementation) game);
             }
             // Those games in the gameCollection are added AFTER the player was created. 
             // We thus need to persist it again to reflect that change.
@@ -97,12 +98,8 @@ public abstract class AbstractBGTDemo {
         }
 
         // Create 5 play sessions
-        for (int i = 0; i < numOfSessions; i++) {
-            Collection<Player> sessionPlayers = rndSubset(players, 2 + RND.nextInt(4));
-            PlaySession newSession = dbManager.createNewPlaySession(faker.date().past(365, TimeUnit.DAYS), rndSubset(sessionPlayers, 1).getFirst(), rndSubset(games, 1).getFirst(), 90 + RND.nextInt(90), sessionPlayers, rndSubset(sessionPlayers, 1).getFirst());
-            sessions.add(newSession);
-        }
-        return sessions;
+
+        return null;
     }
     
 }

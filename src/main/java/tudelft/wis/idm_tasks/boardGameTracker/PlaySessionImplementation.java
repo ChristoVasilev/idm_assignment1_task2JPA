@@ -5,9 +5,11 @@ import tudelft.wis.idm_tasks.boardGameTracker.interfaces.*;
 import java.util.Collection;
 import java.util.Date;
 
-@Entity(name = "play_session")
+@Entity
+@Table(name = "play_sessions")
 public class PlaySessionImplementation implements PlaySession{
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     private Date date;
@@ -17,12 +19,22 @@ public class PlaySessionImplementation implements PlaySession{
     private BoardGameImplementation game;
     @Column(name = "play_time")
     private int playTime;
-    @ManyToMany
-    private Collection<PlayerImplementation> players;
     @ManyToOne
     private PlayerImplementation winner;
+    @ManyToMany
+    @JoinTable(
+            name = "player_in_session",
+            joinColumns = @JoinColumn(name = "session_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_name")
+    )
+    @Column(name = "player_in_session")
+    private Collection<PlayerImplementation> players;
 
     public PlaySessionImplementation() {
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -31,12 +43,12 @@ public class PlaySessionImplementation implements PlaySession{
     }
 
     @Override
-    public Player getHost() {
+    public PlayerImplementation getHost() {
         return host;
     }
 
     @Override
-    public BoardGame getGame() {
+    public BoardGameImplementation getGame() {
         return game;
     }
 
@@ -46,7 +58,7 @@ public class PlaySessionImplementation implements PlaySession{
     }
 
     @Override
-    public Player getWinner() {
+    public PlayerImplementation getWinner() {
         return winner;
     }
 

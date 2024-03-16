@@ -44,7 +44,7 @@ public class PlaySession_POJO implements PlaySession {
 
     @Override
     public Collection<PlayerImplementation> getAllPlayers() {
-        return players;
+        return null;
     }
 
     @Override

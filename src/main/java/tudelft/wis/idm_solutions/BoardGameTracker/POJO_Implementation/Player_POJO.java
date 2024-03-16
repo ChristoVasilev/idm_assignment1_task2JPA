@@ -21,7 +21,6 @@ public class Player_POJO implements Player {
 
     private String name;
     private String nickName;
-    private Collection<BoardGame> gameCollection = new LinkedList<BoardGame>();
 
     /**
      * Instantiates a new Player POJO.
@@ -46,7 +45,7 @@ public class Player_POJO implements Player {
 
     @Override
     public Collection<BoardGameImplementation> getGameCollection() {
-        return gameCollection;
+        return null;
     }
 
 

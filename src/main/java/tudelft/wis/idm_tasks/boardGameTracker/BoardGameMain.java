@@ -7,24 +7,11 @@ import java.util.ArrayList;
 
 public class BoardGameMain {
     public static void main(String[] args) throws BgtException {
-        TableCreator tableCreator = new TableCreator();
-        tableCreator.createDatabase();
-        BgtDataManagerImplementation bgtManager = new BgtDataManagerImplementation();
-        bgtManager.createNewPlayer("toni", "magareto");
-        ArrayList<Player> players = new ArrayList<>(bgtManager.findPlayersByName("toni"));
-        for(Player player : players) {
-            System.out.println(player.getPlayerName());
-            System.out.println(player.getPlayerNickName());
-        }
+        BgtDataManagerImplementation dataManager = new BgtDataManagerImplementation();
+        dataManager.createNewPlayer("itso", "chuka");
+        System.out.println(dataManager.findPlayersByName("its").iterator().next().getPlayerName());
 
-        bgtManager.persistPlayer(new PlayerImplementation("toni", "maimunata"));
-        players = new ArrayList<>(bgtManager.findPlayersByName("toni"));
-        for(Player player : players) {
-            System.out.println(player.getPlayerName());
-            System.out.println(player.getPlayerNickName());
-        }
 
-        bgtManager.eraseDatabase();
 
     }
 

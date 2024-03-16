@@ -1,9 +1,6 @@
 package tudelft.wis.idm_tasks.boardGameTracker;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
 
 
@@ -16,8 +13,15 @@ import java.util.LinkedList;
 public class PlayerImplementation implements Player {
     @Id
     private String name;
+    @Column(name = "nick_name")
     private String nickName;
     @ManyToMany
+    @JoinTable(
+            name = "player_owns_game",
+            joinColumns = @JoinColumn(name = "player_name"),
+            inverseJoinColumns = @JoinColumn(name = "board_game_url")
+    )
+    @Column(name = "player_own_game")
     private Collection<BoardGameImplementation> gameCollection = new LinkedList<>();
 
     /**

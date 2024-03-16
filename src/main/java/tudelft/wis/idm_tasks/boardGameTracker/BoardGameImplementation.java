@@ -2,15 +2,16 @@ package tudelft.wis.idm_tasks.boardGameTracker;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "board_games")
 public class BoardGameImplementation implements tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame {
-
-    @Id
     String name;
     /**
      * The BoardGameGeek.com URL of the boardgame.
      */
+    @Id
     String bggURL;
 
     public BoardGameImplementation() {
