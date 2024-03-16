@@ -37,10 +37,10 @@ public class BgtDataManager_POJO implements BgtDataManager {
     }
 
     @Override
-    public BoardGame createNewBoardgame(String name, String bggURL) throws BgtException {
+    public BoardGameImplementation createNewBoardgame(String name, String bggURL) throws BgtException {
         BoardGame_POJO game = new BoardGame_POJO(name, bggURL);
         games.add(game);
-        return game;
+        return null;
     }
 
     @Override

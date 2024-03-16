@@ -71,7 +71,7 @@ public abstract class AbstractBGTDemo {
     public Collection<PlaySession> createDummyData(int numOfPlayers, int numOfSessions) throws BgtException {
         Collection<PlaySession> sessions = new LinkedList<PlaySession>();
         Collection<Player> players = new LinkedList<Player>();
-        Collection<BoardGame> games = new LinkedList<BoardGame>();
+        Collection<BoardGameImplementation> games = new LinkedList<>();
         BgtDataManager dbManager = getBgtDataManager();
 
         // Create 5 games
@@ -86,9 +86,9 @@ public abstract class AbstractBGTDemo {
         // Create players
         for (int i = 0; i < numOfPlayers; i++) {
             Player newPlayer = dbManager.createNewPlayer(faker.name().fullName(), faker.pokemon().name());
-            Collection<BoardGame> playerGames = rndSubset(games, RND.nextInt(3));
-            for (BoardGame game : playerGames) {
-                newPlayer.getGameCollection().add((BoardGameImplementation) game);
+            Collection<BoardGameImplementation> playerGames = rndSubset(games, RND.nextInt(3));
+            for (BoardGameImplementation game : playerGames) {
+                newPlayer.getGameCollection().add(game);
             }
             // Those games in the gameCollection are added AFTER the player was created. 
             // We thus need to persist it again to reflect that change.

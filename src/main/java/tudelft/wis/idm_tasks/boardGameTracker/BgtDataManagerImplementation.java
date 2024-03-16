@@ -5,9 +5,7 @@ import tudelft.wis.idm_tasks.boardGameTracker.interfaces.BoardGame;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.PlaySession;
 import tudelft.wis.idm_tasks.boardGameTracker.interfaces.Player;
 
-import java.lang.reflect.Type;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -70,15 +68,15 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * them here to make the task test a bit easier. You can call an appropriate
      * persist method for this.
      *
-     * @param name the name of the game
+     * @param name   the name of the game
      * @param bggURL the URL of the game at BoardGameGeek.com
      * @return the new game
      * @throws SQLException DB trouble
      */
-    public BoardGame createNewBoardgame(String name, String bggURL) throws BgtException {
+    public BoardGameImplementation createNewBoardgame(String name, String bggURL) throws BgtException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         EntityTransaction transaction = entityManager.getTransaction();
-        BoardGame boardGame = new BoardGameImplementation(name, bggURL);
+        BoardGameImplementation boardGame = new BoardGameImplementation(name, bggURL);
 
         try {
             transaction.begin();

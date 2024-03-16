@@ -49,12 +49,12 @@ public interface BgtDataManager {
      * them here to make the task test a bit easier. You can call an appropriate
      * persist method for this.
      *
-     * @param name the name of the game
+     * @param name   the name of the game
      * @param bggURL the URL of the game at BoardGameGeek.com
      * @return the new game
      * @throws SQLException DB trouble
      */
-    public BoardGame createNewBoardgame(String name, String bggURL) throws BgtException;
+    public BoardGameImplementation createNewBoardgame(String name, String bggURL) throws BgtException;
         // @TODO: Implement this method.
 
     /**
