@@ -83,5 +83,6 @@ public class BgtDataManagerImplementationTest extends tudelft.wis.idm_solutions.
         Player playerFromDB2 = this.getBgtDataManager().findPlayersByName(player.getPlayerName()).iterator().next();
         assertEquals(numOfGames, playerFromDB2.getGameCollection().size());
 
+        dataManager.eraseDatabase();
     }
 }

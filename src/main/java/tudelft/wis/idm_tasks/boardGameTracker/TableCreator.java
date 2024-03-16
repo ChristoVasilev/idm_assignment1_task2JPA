@@ -37,7 +37,7 @@ public class TableCreator {
     }
 
     public void createBoardGame() {
-        String setup = "CREATE TABLE IF NOT EXISTS board_games (name VARCHAR(64) NOT NULL, bggURL VARCHAR(64) PRIMARY KEY NOT NULL)";
+        String setup = "CREATE TABLE IF NOT EXISTS board_games (name VARCHAR(64) NOT NULL, url VARCHAR(64) PRIMARY KEY NOT NULL)";
         PreparedStatement myStmt = null;
         try {
             getConnection();
@@ -49,9 +49,9 @@ public class TableCreator {
     }
 
     public void createPlayerOwnsBoardGame() {
-        String setup = "CREATE TABLE IF NOT EXISTS player_owns_game ( player_name VARCHAR(64) NOT NULL, board_game_bggURL VARCHAR(64) NOT NULL, "
-        + "PRIMARY KEY (player_name, board_game_bggURL), FOREIGN KEY (player_name) REFERENCES players(name) ON DELETE CASCADE, "
-        + "FOREIGN KEY (board_game_bggURL) REFERENCES board_games(bggURL) ON DELETE CASCADE)";
+        String setup = "CREATE TABLE IF NOT EXISTS player_owns_game ( player_name VARCHAR(64) NOT NULL, board_game_url VARCHAR(64) NOT NULL, "
+        + "PRIMARY KEY (player_name, board_game_url), FOREIGN KEY (player_name) REFERENCES players(name) ON DELETE CASCADE, "
+        + "FOREIGN KEY (board_game_url) REFERENCES board_games(url) ON DELETE CASCADE)";
         PreparedStatement myStmt = null;
         try {
             getConnection();

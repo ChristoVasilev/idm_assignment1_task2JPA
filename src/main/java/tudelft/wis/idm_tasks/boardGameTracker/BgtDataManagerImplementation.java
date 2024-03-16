@@ -67,8 +67,24 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
                 String nickname = resultSet.getString("nick_name");
                 players.add(new PlayerImplementation(fullName, nickname));
             }
+
+            ResultSet boardGameOwned = null;
+            for(Player player : players) {
+                String findGamesQuery = "SELECT bg.name, bg.url FROM board_games AS bg JOIN player_owns_game AS pog " +
+                        "ON pog.board_game_url = bg.url JOIN players AS p ON p.name = pog.player_name " +
+                        "WHERE p.name = ?";
+                PreparedStatement statement = connection.prepareStatement(findGamesQuery);
+                statement.setString(1, player.getPlayerName());
+                boardGameOwned = statement.executeQuery();
+                while(resultSet.next()) {
+                    String boardGameName = boardGameOwned.getString("name");
+                    String bggURL = boardGameOwned.getString("url");
+                    player.getGameCollection().add(new BoardGameImplementation(boardGameName, bggURL));
+                }
+            }
             return players;
         } catch (SQLException e) {
+            eraseDatabase();
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +103,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @throws SQLException DB trouble
      */
     public BoardGame createNewBoardgame(String name, String bggURL) throws BgtException {
-        String insertQuery = "INSERT INTO board_games (name, bggURL) VALUES (?, ?)";
+        String insertQuery = "INSERT INTO board_games (name, url) VALUES (?, ?)";
         getConnection();
         try {
             PreparedStatement myStmt = connection.prepareStatement(insertQuery);
@@ -108,7 +124,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @return collection of all boardgames containing the param substring in their names
      */
     public Collection<BoardGame> findGamesByName(String name) throws BgtException {
-        String findIDQuery = "SELECT name, bggUrl FROM board_games WHERE name LIKE CONCAT(%, ?, %)";
+        String findIDQuery = "SELECT name, url FROM board_games WHERE name LIKE CONCAT(%, ?, %)";
         ResultSet resultSet = null;
         try {
             PreparedStatement myStmt = connection.prepareStatement(findIDQuery);
@@ -116,7 +132,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
             resultSet = myStmt.executeQuery();
             Collection<BoardGame> boardGames = new ArrayList<>();
             while(resultSet.next()) {
-                String bggUrl = resultSet.getString("bggUrl");
+                String bggUrl = resultSet.getString("url");
                 boardGames.add(new BoardGameImplementation(name, bggUrl));
             }
             return boardGames;
@@ -154,7 +170,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
 
     public void addGameToPlayerCollection(Player player, BoardGame boardGame) {
         getConnection();
-        String query = "INSERT INTO player_owns_game (player_name, board_game_bggURL) VALUES (?, ?)";
+        String query = "INSERT INTO player_owns_game (player_name, board_game_url) VALUES (?, ?)";
         try {
             PreparedStatement myStmt = connection.prepareStatement(query);
             myStmt.setString(1, player.getPlayerName());
@@ -167,7 +183,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
 
     public void removeGameFromPlayerCollection(Player player, BoardGame boardGame) {
         getConnection();
-        String query = "DELETE FROM player_owns_game WHERE player_name = ? AND board_game_bggURL = ?";
+        String query = "DELETE FROM player_owns_game WHERE player_name = ? AND board_game_url = ?";
         try {
             PreparedStatement myStmt = connection.prepareStatement(query);
             myStmt.setString(1, player.getPlayerName());
@@ -209,11 +225,12 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @param game the game
      */
     public void persistBoardGame(BoardGame game) {
-        String query = "INSERT INTO board_games (name, bggURL) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET name = ?";
+        String query = "INSERT INTO board_games (name, url) VALUES (?, ?) ON CONFLICT (name) DO UPDATE SET name = ?";
         try {
             PreparedStatement myStmt = connection.prepareStatement(query);
             myStmt.setString(1, game.getName());
             myStmt.setString(2, game.getBGG_URL());
+            myStmt.setString(3, game.getName());
             myStmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -222,7 +239,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
 
     public void eraseDatabase() {
         getConnection();
-        String query = "DELETE FROM players; DELETE FROM board_games; DELETE FROM player_owns_board_game;";
+        String query = "DELETE FROM players; DELETE FROM board_games; DELETE FROM player_owns_game;";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.executeUpdate();
