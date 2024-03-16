@@ -76,7 +76,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
                 PreparedStatement statement = connection.prepareStatement(findGamesQuery);
                 statement.setString(1, player.getPlayerName());
                 boardGameOwned = statement.executeQuery();
-                while(resultSet.next()) {
+                while(boardGameOwned.next()) {
                     String boardGameName = boardGameOwned.getString("name");
                     String bggURL = boardGameOwned.getString("url");
                     player.getGameCollection().add(new BoardGameImplementation(boardGameName, bggURL));
@@ -124,7 +124,7 @@ public class BgtDataManagerImplementation implements tudelft.wis.idm_tasks.board
      * @return collection of all boardgames containing the param substring in their names
      */
     public Collection<BoardGame> findGamesByName(String name) throws BgtException {
-        String findIDQuery = "SELECT name, url FROM board_games WHERE name LIKE CONCAT(%, ?, %)";
+        String findIDQuery = "SELECT name, url FROM board_games WHERE name LIKE CONCAT('%', ?, '%')";
         ResultSet resultSet = null;
         try {
             PreparedStatement myStmt = connection.prepareStatement(findIDQuery);
